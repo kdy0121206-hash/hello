@@ -31,21 +31,22 @@
 
     #hotbar-container {
       position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-      display: flex; gap: 10px; align-items: center; pointer-events: auto;
+      display: flex; gap: 5px; align-items: center; pointer-events: auto;
     }
     #hotbar {
-      display: flex; gap: 5px; background-color: rgba(0,0,0,0.5); padding: 5px; border-radius: 5px;
+      display: flex; gap: 3px; background-color: rgba(0,0,0,0.5); padding: 5px; border-radius: 5px;
     }
+    /* 핫바 9칸을 위해 사이즈 조정 */
     .slot { 
-      width: 40px; height: 40px; border: 2px solid #555; border-radius: 5px; box-sizing: border-box; cursor: pointer; 
+      width: 35px; height: 35px; border: 2px solid #555; border-radius: 5px; box-sizing: border-box; cursor: pointer; 
       background-size: cover; image-rendering: pixelated; 
     }
     .slot.active { border: 3px solid white; transform: scale(1.1); }
     
     #btn-inventory {
-      width: 40px; height: 40px; background-color: rgba(0,0,0,0.6); color: white;
+      width: 40px; height: 35px; background-color: rgba(0,0,0,0.6); color: white;
       border: 2px solid #aaa; border-radius: 5px; font-weight: bold; text-align: center;
-      line-height: 36px; cursor: pointer; box-sizing: border-box; font-size: 18px;
+      line-height: 31px; cursor: pointer; box-sizing: border-box; font-size: 18px;
     }
     #btn-inventory:active { background-color: rgba(255,255,255,0.3); }
 
@@ -55,7 +56,7 @@
       padding: 15px; pointer-events: auto; z-index: 100; color: white; text-align: center;
     }
     #inventory-grid {
-      display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 15px 0;
+      display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 15px 0;
     }
     #btn-close-inv {
       padding: 8px 25px; background-color: #e74c3c; border: 2px solid white; border-radius: 5px; color: white;
@@ -96,6 +97,7 @@
       <div id="progress-container"><div id="progress-bar"></div></div>
     </div>
 
+    <!-- 핫바 9칸으로 확장 -->
     <div id="hotbar-container">
       <div id="hotbar">
         <div id="slot-0" class="slot active" data-index="0"></div>
@@ -103,6 +105,10 @@
         <div id="slot-2" class="slot" data-index="2"></div>
         <div id="slot-3" class="slot" data-index="3"></div>
         <div id="slot-4" class="slot" data-index="4"></div>
+        <div id="slot-5" class="slot" data-index="5"></div>
+        <div id="slot-6" class="slot" data-index="6"></div>
+        <div id="slot-7" class="slot" data-index="7"></div>
+        <div id="slot-8" class="slot" data-index="8"></div>
       </div>
       <div id="btn-inventory">•••</div>
     </div>
@@ -111,7 +117,7 @@
       <div style="font-size:18px; margin-bottom:5px; font-weight:bold;">블록 인벤토리 🎒</div>
       <div style="font-size:12px; color:#ddd;">인벤토리에서 블록을 터치하면 현재 핫바에 장착됩니다.</div>
       <div id="inventory-grid"></div>
-      <button id="btn-close-inv">닫기</button>
+      <button id="btn-close-inv" style="margin-top:10px;">닫기</button>
     </div>
 
     <div id="btn-run">RUN</div>
@@ -184,7 +190,7 @@
     let activeSlotElement = null; 
     
     const raycaster = new THREE.Raycaster();
-    raycaster.far = 150; // 최적화: Ray 최대 길이 제한[cite: 2]
+    raycaster.far = 150; 
     
     const CHUNK_SIZE = 16;
     const RENDER_DISTANCE = 2; 
@@ -257,6 +263,25 @@
         ctx.fillStyle = '#7d7d7d'; ctx.fillRect(0, 0, 16, 16);
         ctx.fillStyle = '#5d5d5d'; ctx.fillRect(1, 1, 4, 4); ctx.fillRect(9, 10, 5, 3);
         ctx.fillStyle = '#33ebcb'; ctx.fillRect(5, 5, 2, 2); ctx.fillRect(12, 8, 2, 2); ctx.fillRect(4, 13, 2, 2);
+      } else if (type === 'planks') {
+        // 추가: 나무 판자
+        ctx.fillStyle = '#cdaa7d'; ctx.fillRect(0,0,16,16);
+        ctx.fillStyle = '#8b6508'; ctx.fillRect(0,3,16,1); ctx.fillRect(0,7,16,1); ctx.fillRect(0,11,16,1); ctx.fillRect(0,15,16,1);
+        ctx.fillRect(4,0,1,3); ctx.fillRect(12,4,1,3); ctx.fillRect(8,8,1,3); ctx.fillRect(2,12,1,3);
+      } else if (type === 'sand') {
+        // 추가: 모래
+        ctx.fillStyle = '#eedd82'; ctx.fillRect(0,0,16,16);
+        ctx.fillStyle = '#d3c05e'; ctx.fillRect(2,2,2,2); ctx.fillRect(10,5,2,2); ctx.fillRect(4,12,2,2); ctx.fillRect(13,13,2,2);
+      } else if (type === 'obsidian') {
+        // 추가: 흑요석
+        ctx.fillStyle = '#1a0b2e'; ctx.fillRect(0,0,16,16);
+        ctx.fillStyle = '#3a1f5c'; ctx.fillRect(2,2,4,4); ctx.fillRect(9,8,5,3);
+        ctx.fillStyle = '#0a0414'; ctx.fillRect(1,1,2,2); ctx.fillRect(12,12,3,3);
+      } else if (type === 'glass') {
+        // 추가: 유리
+        ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.fillRect(0,0,16,16);
+        ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.fillRect(0,0,16,2); ctx.fillRect(0,0,2,16); ctx.fillRect(14,0,2,16); ctx.fillRect(0,14,16,2);
+        ctx.fillRect(3,3,4,4);
       }
       
       const texture = new THREE.CanvasTexture(canvas);
@@ -275,6 +300,10 @@
     const texIron = createTexture('iron_ore');
     const texGold = createTexture('gold_ore');
     const texDiamond = createTexture('diamond_ore');
+    const texPlanks = createTexture('planks'); // 신규
+    const texSand = createTexture('sand');     // 신규
+    const texObsidian = createTexture('obsidian'); // 신규
+    const texGlass = createTexture('glass');   // 신규
 
     const grassMaterials = [
       new THREE.MeshLambertMaterial({ map: texGrassSide }),
@@ -297,7 +326,11 @@
       new THREE.MeshLambertMaterial({ map: texIron }), // 6
       new THREE.MeshLambertMaterial({ map: texGold }), // 7
       new THREE.MeshLambertMaterial({ map: texDiamond }), // 8
-      leafMaterial // 9
+      leafMaterial, // 9
+      new THREE.MeshLambertMaterial({ map: texPlanks }), // 10
+      new THREE.MeshLambertMaterial({ map: texSand }), // 11
+      new THREE.MeshLambertMaterial({ map: texObsidian }), // 12
+      new THREE.MeshLambertMaterial({ map: texGlass, transparent: true, opacity: 0.8 }) // 13
     ];
 
     const allBlocksData = [
@@ -310,14 +343,23 @@
       { index: 6, tex: texIron },
       { index: 7, tex: texGold },
       { index: 8, tex: texDiamond },
-      { index: 9, tex: texLeaves }
+      { index: 9, tex: texLeaves },
+      { index: 10, tex: texPlanks },
+      { index: 11, tex: texSand },
+      { index: 12, tex: texObsidian },
+      { index: 13, tex: texGlass }
     ];
 
+    // 핫바 초기화 (9칸에 기본 할당)
     document.getElementById('slot-0').style.backgroundImage = `url(${texGrassSide.image.toDataURL()})`;
     document.getElementById('slot-1').style.backgroundImage = `url(${texDirt.image.toDataURL()})`;
     document.getElementById('slot-2').style.backgroundImage = `url(${texStone.image.toDataURL()})`;
     document.getElementById('slot-3').style.backgroundImage = `url(${texWood.image.toDataURL()})`;
-    document.getElementById('slot-4').style.backgroundImage = `url(${texBrick.image.toDataURL()})`;
+    document.getElementById('slot-4').style.backgroundImage = `url(${texPlanks.image.toDataURL()})`;
+    document.getElementById('slot-5').style.backgroundImage = `url(${texBrick.image.toDataURL()})`;
+    document.getElementById('slot-6').style.backgroundImage = `url(${texSand.image.toDataURL()})`;
+    document.getElementById('slot-7').style.backgroundImage = `url(${texGlass.image.toDataURL()})`;
+    document.getElementById('slot-8').style.backgroundImage = `url(${texObsidian.image.toDataURL()})`;
     activeSlotElement = document.getElementById('slot-0');
 
     function randomSeed(x, y, z) {
@@ -370,12 +412,13 @@
       scene.add(selectionOutline);
 
       renderer = new THREE.WebGLRenderer({ antialias: false });
-      renderer.setPixelRatio(1.0); // 최적화: 모바일 픽셀 비율 1.0 고정[cite: 2]
+      renderer.setPixelRatio(1.0); 
       renderer.setSize(window.innerWidth, window.innerHeight);
       document.body.appendChild(renderer.domElement);
 
       let initH = Math.floor(noise.noise2D(0, 0) * 3 + noise.noise2D(0, 0) * 1.5 + 3);
-      yawObject.position.set(0, initH * 20 + 30, 0);
+      // 스폰 시 블록 끼임 방지를 위해 Y축(높이) 대폭 상향 적용 완료
+      yawObject.position.set(0, initH * 20 + 150, 0);
 
       setupTouchControls();
       setupInventory();
@@ -398,7 +441,6 @@
                 let h = Math.floor(noise.noise2D(nx, nz) * 3 + noise.noise2D(nx * 2, nz * 2) * 1.5 + 3);
                 if (h < 1) h = 1;
 
-                // 최적화: 지표면 기준 아래 3칸까지만 렌더링[cite: 2]
                 const startY = Math.max(maxDepth, h - 3);
                 for (let y = startY; y <= h; y++) {
                     if (destroyedTerrain.has(`${worldX},${y},${worldZ}`)) continue;
@@ -504,7 +546,6 @@
         const obj = interactableObjects[i];
         if (obj.name === 'floor') continue; 
         
-        // 최적화: 충돌 검사 빠른 탈락 (Fast Fail)[cite: 2]
         const dx = Math.abs(obj.position.x - pos.x);
         if (dx > 40) continue;
         const dz = Math.abs(obj.position.z - pos.z);
@@ -840,7 +881,8 @@
       direction.x = Number(moveRight) - Number(moveLeft);
       direction.normalize(); 
 
-      const currentSpeed = isRunning ? 1200.0 : 600.0; 
+      // 이동속도 2배 상향 적용 완료
+      const currentSpeed = isRunning ? 2400.0 : 1200.0; 
 
       if (moveForward || moveBackward) velocity.z += direction.z * currentSpeed * delta;
       if (moveLeft || moveRight) velocity.x += direction.x * currentSpeed * delta;
